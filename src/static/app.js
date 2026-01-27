@@ -409,6 +409,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Helper function to escape HTML entities
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // Function to display filtered activities
   function displayFilteredActivities() {
     // Clear the activities list
@@ -492,7 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
         break;
       case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        shareUrl = `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
         break;
       case "linkedin":
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
@@ -596,19 +603,19 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       </div>
       <div class="share-buttons">
-        <button class="share-button tooltip" data-platform="facebook" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+        <button class="share-button tooltip" data-platform="facebook" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
           <span class="share-icon">📘</span>
           <span class="tooltip-text">Share on Facebook</span>
         </button>
-        <button class="share-button tooltip" data-platform="twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+        <button class="share-button tooltip" data-platform="twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
           <span class="share-icon">🐦</span>
           <span class="tooltip-text">Share on Twitter</span>
         </button>
-        <button class="share-button tooltip" data-platform="linkedin" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+        <button class="share-button tooltip" data-platform="linkedin" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
           <span class="share-icon">💼</span>
           <span class="tooltip-text">Share on LinkedIn</span>
         </button>
-        <button class="share-button tooltip" data-platform="email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+        <button class="share-button tooltip" data-platform="email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
           <span class="share-icon">📧</span>
           <span class="tooltip-text">Share via Email</span>
         </button>

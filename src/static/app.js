@@ -409,6 +409,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Helper function to escape HTML entities
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // Function to display filtered activities
   function displayFilteredActivities() {
     // Clear the activities list
@@ -470,6 +477,49 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+  }
+
+  // Handle social sharing
+  function handleShare(event) {
+    const button = event.currentTarget;
+    const platform = button.dataset.platform;
+    const activityName = button.dataset.activity;
+    const description = button.dataset.description;
+
+    // Build the share URL and message
+    const currentUrl = window.location.origin + window.location.pathname;
+    const shareText = `Check out this activity at Mergington High School: ${activityName} - ${description}`;
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(currentUrl);
+
+    let shareUrl = "";
+
+    switch (platform) {
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        break;
+      case "twitter":
+        shareUrl = `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        break;
+      case "linkedin":
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      case "email":
+        shareUrl = `mailto:?subject=${encodeURIComponent(
+          `Check out ${activityName}`
+        )}&body=${encodedText}%0A%0A${encodedUrl}`;
+        break;
+      default:
+        console.error("Unknown sharing platform:", platform);
+        return;
+    }
+
+    // Open share URL
+    if (platform === "email") {
+      window.location.href = shareUrl;
+    } else {
+      window.open(shareUrl, "_blank", "width=600,height=400");
+    }
   }
 
   // Function to render a single activity card
@@ -552,6 +602,24 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-buttons">
+        <button class="share-button tooltip" data-platform="facebook" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
+          <span class="share-icon">📘</span>
+          <span class="tooltip-text">Share on Facebook</span>
+        </button>
+        <button class="share-button tooltip" data-platform="twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
+          <span class="share-icon">🐦</span>
+          <span class="tooltip-text">Share on Twitter</span>
+        </button>
+        <button class="share-button tooltip" data-platform="linkedin" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
+          <span class="share-icon">💼</span>
+          <span class="tooltip-text">Share on LinkedIn</span>
+        </button>
+        <button class="share-button tooltip" data-platform="email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
+          <span class="share-icon">📧</span>
+          <span class="tooltip-text">Share via Email</span>
+        </button>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -575,6 +643,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", handleShare);
     });
 
     // Add click handler for register button (only when authenticated)
